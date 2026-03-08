@@ -2,6 +2,8 @@ package br.com.alura.screenmatch.model;
 
 import java.util.OptionalDouble;
 
+import br.com.alura.screenmatch.service.traducao.ConsultaMyMemory;
+
 public class Serie {
     private String titulo;
     private Integer totalTemporadas;
@@ -18,7 +20,7 @@ public class Serie {
         this.genero = Categoria.fromString(dados.genero().split(",")[0].trim());
         this.atores = dados.atores();
         this.poster = dados.posters();
-        this.sinopse = dados.sinopse();
+        this.sinopse = ConsultaMyMemory.obterTraducao(dados.sinopse()).trim();
     }
 
     public String getTitulo() {
