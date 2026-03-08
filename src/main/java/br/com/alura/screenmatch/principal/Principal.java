@@ -6,12 +6,17 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import br.com.alura.screenmatch.model.DadosSerie;
 import br.com.alura.screenmatch.model.DadosTemporada;
 import br.com.alura.screenmatch.model.Serie;
+import br.com.alura.screenmatch.repository.SerieRepository;
 import br.com.alura.screenmatch.service.ConsumoApi;
 import br.com.alura.screenmatch.service.ConverteDados;
 
+@Service
 public class Principal {
 
     private Scanner leitura = new Scanner(System.in);
@@ -20,6 +25,13 @@ public class Principal {
     private final String ENDERECO = "https://www.omdbapi.com/?t=";
     private final String API_KEY = "&apikey=6585022c";
     private List<DadosSerie> dadosSeries = new ArrayList<>();
+
+    @Autowired
+    private SerieRepository serieRepository;
+
+    public Principal(SerieRepository serieRepository) {
+        this.serieRepository = serieRepository;
+    }
 
     public void exibeMenu() {
         var opcao = -1;
@@ -58,7 +70,8 @@ public class Principal {
 
     private void buscarSerieWeb() {
         DadosSerie dados = getDadosSerie();
-        dadosSeries.add(dados);
+        Serie serie = new Serie(dados);
+        serieRepository.save(serie);
         System.out.println(dados);
     }
 
@@ -99,7 +112,7 @@ public class Principal {
         System.out.println();
         System.out.println("Series buscadas:");
         System.out.println();
-        
+
         series.stream()
                 .sorted(Comparator.comparing(Serie::getGenero))
                 .forEach(System.out::println);
