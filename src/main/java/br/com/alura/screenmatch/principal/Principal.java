@@ -97,17 +97,8 @@ public class Principal {
     }
 
     private void listarSeriesBuscadas() {
-        if (dadosSeries.isEmpty()) {
-            System.out.println();
-            System.out.println("Nenhuma série buscada.");
-            System.out.println();
-            return;
-        }
 
-        List<Serie> series = new ArrayList<>();
-        series = dadosSeries.stream()
-                .map(d -> new Serie(d))
-                .collect(Collectors.toList());
+        List<Serie> series = series = serieRepository.findAll();
 
         System.out.println();
         System.out.println("Series buscadas:");
