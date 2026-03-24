@@ -139,7 +139,7 @@ public class Serie {
 
                 "\nAtores = " + atores +
                 "\nPoster = " + poster +
-                "\nSinopse = " + sinopse + "\n" +
-                "\nEpisodios = " + episodios + "\n";
+                "\nSinopse = " + sinopse + "\n" ;
+                // "\nEpisodios = " + episodios + "\n";
     }
 }
