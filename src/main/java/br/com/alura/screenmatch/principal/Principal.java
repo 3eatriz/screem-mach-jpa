@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.alura.screenmatch.model.Categoria;
 import br.com.alura.screenmatch.model.DadosSerie;
 import br.com.alura.screenmatch.model.DadosTemporada;
 import br.com.alura.screenmatch.model.Episodio;
@@ -44,6 +45,9 @@ public class Principal {
                     2 - Buscar episódios
                     3 - Listar séries buscadas
                     4 - Buscar série por título
+                    5 - Buscar séries por ator
+                    6 - Buscar top 5 séries
+                    7 - Buscar série por categoria
 
                     0 - Sair
                     """;
@@ -65,6 +69,15 @@ public class Principal {
                 case 4:
                     buscarSeriePorTitulo();
                     break;
+                case 5:
+                    buscarSeriesPorAtor();
+                    break;
+                case 6:
+                    buscarTop5Series();
+                    break;
+                case 7:
+                    buscarSeriesPorCategoria();
+                    break;
                 case 0:
                     System.out.println("Saindo...");
                     break;
@@ -73,6 +86,31 @@ public class Principal {
             }
         }
 
+    }
+
+    private void buscarSeriesPorCategoria() {
+        System.out.println("Digite a categoria para buscar as séries:");
+        var nomeGenero = leitura.nextLine();
+        Categoria categoria = Categoria.fromPortugues(nomeGenero);
+        List<Serie> series = serieRepository.findByGenero(categoria);
+        System.out.println("Series encontradas para a categoria " + nomeGenero + ":");
+        series.forEach(s -> System.out.println(s.getTitulo());
+    }
+
+    private void buscarTop5Series() {
+        System.out.println("Top 5 séries por avaliação:");
+        List<Serie> top5Series = serieRepository.findTop5ByOrderByAvaliacaoDesc();
+        top5Series.forEach(s -> System.out.println(s.getTitulo() + " - Avaliação: " + s.getAvaliacao()));
+    }
+
+    private void buscarSeriesPorAtor() {
+        System.out.println("Digite o nome do ator para buscar as séries:");
+        var nomeAtor = leitura.nextLine();
+        System.out.println("Digite a avaliação mínima para buscar as séries:");
+        var avaliacaoMinima = leitura.nextDouble();
+        List<Serie> series = serieRepository.findByAtoresContainingIgnoreCaseAndAvaliacaoGreaterThanEqual(nomeAtor, avaliacaoMinima);
+        System.out.println("Series encontradas para o ator " + nomeAtor + ":");
+        series.forEach(s -> System.out.println(s.getTitulo() + " - Avaliação: " + s.getAvaliacao()));
     }
 
     private void buscarSerieWeb() {
