@@ -30,6 +30,8 @@ public class Principal {
     private List<DadosSerie> dadosSeries = new ArrayList<>();
     private List<Serie> series = new ArrayList<>();
 
+    private Optional<Serie> serieBuscada;
+
     @Autowired
     private SerieRepository serieRepository;
 
@@ -49,6 +51,9 @@ public class Principal {
                     6 - Buscar top 5 séries
                     7 - Buscar série por categoria
                     8 - Filtrar séries por número de temporadas e avaliação
+                    9 - Buscar episódio por trecho
+                    10 - Top 5 episódios por série
+                    11 - Buscar episódios a partir de uma data
 
                     0 - Sair
                     """;
@@ -82,6 +87,15 @@ public class Principal {
                 case 8:
                     filtrarSeriesPorTemporadasEAvaliacao();
                     break;
+                case 9:
+                    buscarEpisodioPorTrecho();
+                    break;
+                case 10:
+                    topEpisodiosPorSerie();
+                    break;
+                case 11:
+                    buscarEpisodiosDepoisDeUmaData();
+                    break;
                 case 0:
                     System.out.println("Saindo...");
                     break;
@@ -92,12 +106,43 @@ public class Principal {
 
     }
 
+    private void buscarEpisodiosDepoisDeUmaData() {
+        buscarSeriePorTitulo();
+        if(serieBuscada.isPresent()) {
+            System.out.println("Digite o ano limite de lançamento");
+            var anoLancamento = leitura.nextInt();
+            leitura.nextLine();
+
+            List<Episodio> episodiosAno = serieRepository.episodioPorSerieEAno(anoLancamento, serieBuscada.get());
+            episodiosAno.forEach(e -> System.out.println("Temporada: " + e.getTemporada() + " - Episódio: " + e.getTitulo() + " - Data de Lançamento: " + e.getDataLancamento()));
+        }
+    }
+
+    private void topEpisodiosPorSerie() {
+        buscarSeriePorTitulo();
+        if(serieBuscada.isPresent()) {
+            var serie = serieBuscada.get();
+            List<Episodio> topEpisodios = serieRepository.topEpisodiosPorSerie(serie);
+            System.out.println("Top 5 episódios da série " + serie.getTitulo() + ":");
+            topEpisodios.forEach(e -> System.out.println("Temporada: " + e.getTemporada() + " - Episódio: " + e.getTitulo() + " - Avaliação: " + e.getAvaliacao()));
+        }
+    }
+
+    private void buscarEpisodioPorTrecho() {
+        System.out.println("Digite o nome para buscar os episódios:");
+        var trecho = leitura.nextLine();
+        List<Episodio> episodios = serieRepository.episodiosPorTrecho(trecho);
+        episodios.forEach(e -> System.out.println("Série: " + e.getSerie().getTitulo() + " - Temporada: " + e.getTemporada() + " - Episódio: " + e.getTitulo()));
+
+    }
+        
+
     private void filtrarSeriesPorTemporadasEAvaliacao() {
         System.out.println("Digite o número máximo de temporadas para filtrar as séries:");
         var totalTemporadas = leitura.nextInt();
         System.out.println("Digite a avaliação mínima para filtrar as séries:");
         var avaliacao = leitura.nextDouble();
-        List<Serie> series = serieRepository.findByTotalTemporadasLessThanEqualAndAvaliacaoGreaterThanEqual(totalTemporadas, avaliacao);
+        List<Serie> series = serieRepository.seriesPorTemporadaEAvaliacao(totalTemporadas, avaliacao);
         System.out.println("Series encontradas com no máximo " + totalTemporadas + " temporadas e avaliação mínima de " + avaliacao + ":");
         series.forEach(System.out::println);
     }
@@ -188,7 +233,7 @@ public class Principal {
     private void buscarSeriePorTitulo() {
         System.out.println("Digite o nome da série para a busca:");
         var nomeSerie = leitura.nextLine();
-        Optional<Serie> serieBuscada = serieRepository.findByTituloContainingIgnoreCase(nomeSerie);
+        serieBuscada = serieRepository.findByTituloContainingIgnoreCase(nomeSerie);
 
         if(serieBuscada.isPresent()) {
             System.out.println("Dados da série: " + serieBuscada.get());
